@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic Tĩnh và Sống động về Dấu ấn Ung thư</title>
+    <!-- Chosen Palette: Professional Teal/Green -->
+    <!-- Application Structure Plan: Giữ nguyên cấu trúc 5 tab. Loại bỏ hoàn toàn các lệnh gọi API động. Nội dung AI (giải thích chuyên sâu, case lâm sàng) được tạo trước và nhúng trực tiếp vào HTML trong các div ẩn. Các nút bấm AI giờ đây chỉ có chức năng bật/tắt (toggle) các div này. Thêm hiệu ứng động khi cuộn trang bằng IntersectionObserver để tăng tính hấp dẫn thị giác. Cấu trúc này tạo ra một ứng dụng hoàn toàn tĩnh, độc lập, nhanh và có thể sử dụng ngoại tuyến. -->
+    <!-- Visualization & Content Choices: 
+    - Nội dung AI tĩnh: Nhúng trực tiếp văn bản đã tạo vào các thẻ, đảm bảo khả năng truy cập ngoại tuyến và tốc độ tải tức thì.
+    - Hiệu ứng động khi cuộn (Scroll Animations): Sử dụng IntersectionObserver để kích hoạt các hiệu ứng CSS (ví dụ: fade-in, slide-up) khi người dùng cuộn đến các phần tử. Mục tiêu: Làm cho infographic trở nên "sống động" và hấp dẫn hơn mà không ảnh hưởng đến hiệu suất.
+    - Chuyển đổi mượt mà (Smooth Transitions): Áp dụng các hiệu ứng transition cho việc mở rộng thẻ và hiển thị nội dung chi tiết, tạo cảm giác mượt mà, chuyên nghiệp.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            overflow-x: hidden;
+        }
+        .tab-active {
+            border-color: #0d9488;
+            color: #0d9488;
+            font-weight: 700;
+            background-color: #f0fdfa;
+        }
+        .tab-inactive { border-color: transparent; color: #475569; }
+        .tab-inactive:hover { color: #0d9488; border-color: #ccfbf1; }
+        .marker-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+        }
+        .marker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-color: #5eead4;
+        }
+        .marker-detail, .static-ai-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s ease-in-out;
+        }
+        .marker-card.open .marker-detail, .static-ai-content.open {
+            max-height: 2000px; /* Large enough for content */
+        }
+        .chart-container { position: relative; margin: auto; height: 45vh; width: 100%; max-width: 800px; max-height: 450px; }
+        .cancer-btn-active { background-color: #0d9488; color: white; font-weight: 600; }
+        .gradient-text { background: linear-gradient(to right, #14b8a6, #0d9488); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .ai-button {
+            background: linear-gradient(to right, #10b981, #0d9488);
+            color: white;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .ai-button:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); }
+        
+        /* Animation styles */
+        .animated-item {
+            opacity: 0;
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up { transform: translateY(30px); }
+        .fade-in-down { transform: translateY(-30px); }
+        .fade-in-left { transform: translateX(-30px); }
+        .fade-in-right { transform: translateX(30px); }
+        .is-visible {
+            opacity: 1;
+            transform: translate(0, 0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10 animated-item fade-in-down">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800">
+                <span class="gradient-text">Infographic Dấu Ấn Ung Thư</span>
+            </h1>
+            <p class="mt-3 text-lg text-slate-600">Phiên bản Tĩnh & Sống động</p>
+        </header>
+
+        <nav class="mb-10 animated-item fade-in-up">
+            <ul class="flex flex-wrap -mb-px justify-center text-sm font-medium text-center shadow-sm rounded-lg bg-white p-2">
+                <li class="flex-1"><button class="w-full inline-flex justify-center items-center p-4 border-b-4 rounded-t-lg tab-active" data-tab="overview"><span class="text-2xl mr-2">📖</span>Tổng Quan</button></li>
+                <li class="flex-1"><button class="w-full inline-flex justify-center items-center p-4 border-b-4 rounded-t-lg tab-inactive" data-tab="markers"><span class="text-2xl mr-2">🧬</span>Tra Cứu Chi Tiết</button></li>
+                <li class="flex-1"><button class="w-full inline-flex justify-center items-center p-4 border-b-4 rounded-t-lg tab-inactive" data-tab="application"><span class="text-2xl mr-2">📊</span>Ứng Dụng Lâm Sàng</button></li>
+                <li class="flex-1"><button class="w-full inline-flex justify-center items-center p-4 border-b-4 rounded-t-lg tab-inactive" data-tab="bycancer"><span class="text-2xl mr-2">🩺</span>Theo Bệnh Học</button></li>
+                <li class="flex-1"><button class="w-full inline-flex justify-center items-center p-4 border-b-4 rounded-t-lg tab-inactive" data-tab="molecular"><span class="text-2xl mr-2">🔬</span>Dấu Ấn Phân Tử</button></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Overview Section -->
+            <section id="overview" class="tab-content">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg animated-item fade-in-up">
+                    <h2 class="text-3xl font-bold mb-6 text-center gradient-text">Nguyên Tắc Cơ Bản</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="border-l-4 border-teal-500 p-6 bg-teal-50 rounded-r-xl animated-item fade-in-left"><h3 class="font-bold text-xl mb-3 text-teal-800 flex items-center"><span class="text-2xl mr-3">🎯</span>Dấu Ấn Lý Tưởng</h3><ul class="list-none space-y-2 text-slate-700"><li class="flex items-start"><span class="text-teal-600 mr-2 font-bold">✓</span>Đặc hiệu 100% cho một loại ung thư.</li><li class="flex items-start"><span class="text-teal-600 mr-2 font-bold">✓</span>Nhạy 100% để phát hiện khối u nhỏ nhất.</li><li class="flex items-start"><span class="text-teal-600 mr-2 font-bold">✓</span>Nồng độ tương quan với khối lượng u.</li><li class="flex items-start"><span class="text-teal-600 mr-2 font-bold">✓</span>Có giá trị tiên lượng chính xác.</li><li class="flex items-start"><span class="text-teal-600 mr-2 font-bold">✓</span>Thời gian bán hủy ngắn để theo dõi nhanh.</li></ul></div>
+                        <div class="border-l-4 border-amber-500 p-6 bg-amber-50 rounded-r-xl animated-item fade-in-right"><h3 class="font-bold text-xl mb-3 text-amber-800 flex items-center"><span class="text-2xl mr-3">⚠️</span>Thực Tế Lâm Sàng</h3><p class="text-slate-700">Không có dấu ấn nào là "lý tưởng". Hầu hết là các <span class="font-semibold text-amber-900">dấu ấn liên quan đến khối u (tumor-associated)</span>, nghĩa là chúng cũng có thể tăng trong các bệnh lý lành tính hoặc ở người khỏe mạnh. Do đó, chúng hiếm khi được dùng đơn độc để chẩn đoán xác định mà cần kết hợp với các phương pháp khác.</p></div>
+                    </div>
+                    <h3 class="text-2xl font-bold mt-10 mb-5 text-center text-slate-700 animated-item fade-in-up">Các Nhóm Dấu Ấn Chính</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+                        <div class="bg-slate-100 p-4 rounded-lg animated-item fade-in-up" style="transition-delay: 100ms;"><span class="text-3xl">🧪</span><p class="font-semibold mt-2">Enzym</p></div>
+                        <div class="bg-slate-100 p-4 rounded-lg animated-item fade-in-up" style="transition-delay: 200ms;"><span class="text-3xl">💊</span><p class="font-semibold mt-2">Hormon</p></div>
+                        <div class="bg-slate-100 p-4 rounded-lg animated-item fade-in-up" style="transition-delay: 300ms;"><span class="text-3xl">👶</span><p class="font-semibold mt-2">Kháng nguyên Bào thai</p></div>
+                        <div class="bg-slate-100 p-4 rounded-lg animated-item fade-in-up" style="transition-delay: 400ms;"><span class="text-3xl">🧱</span><p class="font-semibold mt-2">Cytokeratin</p></div>
+                        <div class="bg-slate-100 p-4 rounded-lg animated-item fade-in-up" style="transition-delay: 500ms;"><span class="text-3xl">🍬</span><p class="font-semibold mt-2">Carbohydrate</p></div>
+                        <div class="bg-slate-100 p-4 rounded-lg animated-item fade-in-up" style="transition-delay: 600ms;"><span class="text-3xl">🧬</span><p class="font-semibold mt-2">Protein & Thụ thể</p></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Other sections are hidden by default -->
+            <section id="markers" class="tab-content hidden"><div class="bg-white p-6 md:p-8 rounded-xl shadow-lg"><h2 class="text-3xl font-bold mb-2 text-center gradient-text">Tra Cứu Dấu Ấn Ung Thư</h2><p class="mb-8 text-center text-slate-500">Sử dụng bộ lọc hoặc tìm kiếm để tra cứu nhanh. Nhấn vào thẻ để xem chi tiết.</p><div class="flex flex-col md:flex-row gap-4 mb-8"><input type="text" id="searchInput" placeholder="Tìm kiếm theo tên (ví dụ: PSA, CEA...)" class="flex-grow p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"><select id="categoryFilter" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"><option value="all">Tất cả các nhóm</option><option value="Enzym">Enzym</option><option value="Hormon">Hormon</option><option value="Kháng nguyên Bào thai">Kháng nguyên Bào thai</option><option value="Cytokeratin">Cytokeratin</option><option value="Carbohydrate">Carbohydrate & Nhóm máu</option><option value="Protein">Protein & Thụ thể</option><option value="Khác">Khác</option></select></div><div id="marker-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div></div></section>
+            <section id="application" class="tab-content hidden"><div class="bg-white p-6 md:p-8 rounded-xl shadow-lg"><h2 class="text-3xl font-bold mb-2 text-center gradient-text">Giá Trị Ứng Dụng Lâm Sàng</h2><p class="mb-8 text-center text-slate-500">Vai trò quan trọng nhất là theo dõi điều trị và phát hiện tái phát.</p><div class="chart-container mb-8 animated-item fade-in-up"><canvas id="applicationChart"></canvas></div><div class="grid md:grid-cols-2 gap-6 text-sm"><div class="bg-teal-50 p-5 rounded-lg border border-teal-200 animated-item fade-in-up" style="transition-delay: 100ms;"><h3 class="font-bold text-lg text-teal-800 mb-2 flex items-center"><span class="text-2xl mr-3">📈</span>Theo dõi & Tái phát (Rất quan trọng)</h3><p>Đây là ứng dụng giá trị nhất. Sự thay đổi nồng độ dấu ấn phản ánh tình trạng bệnh, giúp đánh giá đáp ứng điều trị và phát hiện sớm tái phát.</p></div><div class="bg-blue-50 p-5 rounded-lg border border-blue-200 animated-item fade-in-up" style="transition-delay: 200ms;"><h3 class="font-bold text-lg text-blue-800 mb-2 flex items-center"><span class="text-2xl mr-3">⚖️</span>Tiên lượng (Có giá trị)</h3><p>Nồng độ trước điều trị tương quan với gánh nặng khối u, cung cấp thông tin tiên lượng. Nồng độ cao thường liên quan đến tiên lượng xấu hơn.</p></div><div class="bg-amber-50 p-5 rounded-lg border border-amber-200 animated-item fade-in-up" style="transition-delay: 300ms;"><h3 class="font-bold text-lg text-amber-800 mb-2 flex items-center"><span class="text-2xl mr-3">❓</span>Chẩn đoán (Hạn chế)</h3><p>Do độ đặc hiệu thấp, dấu ấn ung thư hiếm khi được dùng để chẩn đoán xác định mà chỉ mang tính chất gợi ý, hỗ trợ chẩn đoán phân biệt.</p></div><div class="bg-red-50 p-5 rounded-lg border border-red-200 animated-item fade-in-up" style="transition-delay: 400ms;"><h3 class="font-bold text-lg text-red-800 mb-2 flex items-center"><span class="text-2xl mr-3">🚫</span>Sàng lọc (Rất hạn chế)</h3><p>Hầu hết không được dùng để sàng lọc trong cộng đồng do độ nhạy và đặc hiệu thấp ở giai đoạn sớm, dẫn đến nhiều kết quả dương tính giả.</p></div></div></div></section>
+            <section id="bycancer" class="tab-content hidden"><div class="bg-white p-6 md:p-8 rounded-xl shadow-lg"><h2 class="text-3xl font-bold mb-2 text-center gradient-text">Tra Cứu Dấu Ấn Theo Loại Ung Thư</h2><p class="mb-8 text-center text-slate-500">Chọn một loại ung thư để xem các dấu ấn liên quan chính.</p><div id="cancer-filter-buttons" class="flex flex-wrap justify-center gap-3 mb-8"></div><div id="cancer-marker-results" class="bg-gray-50 p-6 rounded-lg min-h-[250px] border"><p class="text-slate-500 text-center pt-16">Vui lòng chọn một loại ung thư từ các nút ở trên để xem thông tin chi tiết.</p></div></div></section>
+            <section id="molecular" class="tab-content hidden"><div class="bg-white p-6 md:p-8 rounded-xl shadow-lg"><h2 class="text-3xl font-bold mb-2 text-center gradient-text">Y Học Chính Xác & Dấu Ấn Phân Tử</h2><p class="mb-8 text-center text-slate-500">Xác định các thay đổi di truyền đặc hiệu để lựa chọn liệu pháp điều trị đích.</p><div class="grid lg:grid-cols-2 gap-8"><div class="space-y-6 animated-item fade-in-left"><h3 class="text-2xl font-bold text-center text-green-700">Gen Ung Thư (Oncogenes) - "Chân Ga"</h3><div class="p-5 border rounded-lg bg-green-50 border-green-200"><h4 class="font-bold text-lg text-green-800">HER-2/neu (c-erbB-2)</h4><p class="mb-2"><span class="font-semibold">Ung thư:</span> Vú, buồng trứng, dạ dày.</p><p class="mb-2"><span class="font-semibold">Vai trò:</span> Khuếch đại gen, thúc đẩy tăng sinh không kiểm soát.</p><p><span class="font-semibold">Ứng dụng:</span> Khối u <span class="font-semibold text-green-600">HER-2 dương tính</span> đáp ứng với liệu pháp đích <span class="font-semibold">Trastuzumab (Herceptin)</span>.</p></div><div class="p-5 border rounded-lg bg-green-50 border-green-200"><h4 class="font-bold text-lg text-green-800">K-ras</h4><p class="mb-2"><span class="font-semibold">Ung thư:</span> Đại trực tràng, tụy, phổi.</p><p class="mb-2"><span class="font-semibold">Vai trò:</span> Đột biến làm protein Ras hoạt động liên tục.</p><p><span class="font-semibold">Ứng dụng:</span> Khối u có <span class="font-semibold text-red-600">đột biến K-ras</span> sẽ <span class="font-semibold">KHÔNG</span> đáp ứng với liệu pháp kháng EGFR.</p></div></div><div class="space-y-6 animated-item fade-in-right"><h3 class="text-2xl font-bold text-center text-red-700">Gen Ức chế Khối u - "Phanh Xe"</h3><div class="p-5 border rounded-lg bg-red-50 border-red-200"><h4 class="font-bold text-lg text-red-800">p53</h4><p class="mb-2"><span class="font-semibold">Ung thư:</span> Hầu hết các loại (đột biến phổ biến nhất).</p><p class="mb-2"><span class="font-semibold">Vai trò:</span> "Người bảo vệ bộ gen", dừng chu trình tế bào hoặc kích hoạt apoptosis khi có tổn thương DNA.</p><p><span class="font-semibold">Ứng dụng:</span> Mất chức năng p53 liên quan đến tiên lượng xấu và kháng trị.</p></div><div class="p-5 border rounded-lg bg-red-50 border-red-200"><h4 class="font-bold text-lg text-red-800">BRCA1 / BRCA2</h4><p class="mb-2"><span class="font-semibold">Ung thư:</span> Vú, buồng trứng, tuyến tiền liệt, tụy.</p><p class="mb-2"><span class="font-semibold">Vai trò:</span> Sửa chữa đứt gãy sợi đôi DNA.</p><p><span class="font-semibold">Ứng dụng:</span> Đánh giá nguy cơ di truyền. Khối u có đột biến BRCA là mục tiêu của liệu pháp <span class="font-semibold">ức chế PARP</span>.</p></div></div></div></div></section>
+        </main>
+
+        <footer class="text-center mt-12 pt-8 border-t border-slate-200 text-sm text-slate-500 animated-item fade-in-up">
+            <p class="font-semibold text-slate-700">Dữ liệu được biên soạn bởi TEAMDRCAT dựa trên kiến thức chuẩn Y Hà Nội.</p>
+            <p class="mt-1">&copy; 2025 Cẩm nang Tương tác về Dấu ấn Ung thư. Chỉ dành cho mục đích tham khảo và học tập.</p>
+        </footer>
+    </div>
+
+<script>
+const markerData = [
+    { name: 'Alkaline Phosphatase (ALP)', category: 'Enzym', icon: '🧪', description: 'Tăng trong di căn gan và xương. Cần kết hợp với GGT, 5\'-nucleotidase để xác định nguồn gốc.', associatedCancers: ['Gan (di căn)', 'Xương (di căn)', 'Bệnh Hodgkin'], clinicalUse: 'Theo dõi di căn.', aiExplanation: '<b>Cơ chế Sinh học:</b> ALP là một nhóm enzym có chức năng loại bỏ nhóm phosphate khỏi nhiều loại phân tử. Ở người khỏe mạnh, nó tồn tại chủ yếu ở gan (trong tế bào lót đường mật) và xương (trong các nguyên bào xương), tham gia vào quá trình chuyển hóa và tạo xương.<br><br><b>Vai trò trong Bệnh học:</b> Khi ung thư di căn đến gan, các khối u chèn ép hoặc phá hủy đường mật, gây tắc mật và giải phóng ALP vào máu. Khi di căn đến xương, các tế bào ung thư kích thích hoạt động của nguyên bào xương, làm tăng sản xuất ALP. Do đó, nồng độ ALP tăng phản ánh hoạt động bệnh lý tại gan hoặc xương.<br><br><b>Ý nghĩa Lâm sàng:</b> ALP là một dấu ấn nhạy nhưng không đặc hiệu. Nồng độ tăng cao gợi ý mạnh mẽ đến di căn gan hoặc xương, cần được xác nhận bằng các dấu ấn khác (GGT cho gan) hoặc chẩn đoán hình ảnh (xạ hình xương). Nó hữu ích trong việc theo dõi sự tiến triển của di căn xương ở bệnh nhân ung thư vú, tuyến tiền liệt.' },
+    { name: 'Lactate Dehydrogenase (LD)', category: 'Enzym', icon: '🧪', description: 'Không đặc hiệu, tăng trong nhiều loại ung thư do phá hủy tế bào. Nồng độ tương quan với gánh nặng khối u và có giá trị tiên lượng.', associatedCancers: ['U lympho', 'Bệnh bạch cầu', 'U tế bào mầm', 'U sắc tố'], clinicalUse: 'Tiên lượng, theo dõi.', aiExplanation: '<b>Cơ chế Sinh học:</b> LD là một enzym nội bào quan trọng, tham gia vào con đường đường phân kỵ khí, chuyển đổi pyruvate thành lactate. Nó có mặt trong hầu hết các tế bào của cơ thể.<br><br><b>Vai trò trong Bệnh học:</b> Các khối u phát triển nhanh thường có chuyển hóa đường phân mạnh và tỷ lệ hoại tử tế bào cao. Khi tế bào ung thư chết và vỡ ra, chúng giải phóng một lượng lớn LD vào máu. Do đó, nồng độ LD huyết thanh phản ánh gánh nặng khối u (tổng khối lượng tế bào ung thư) và tốc độ thay thế tế bào.<br><br><b>Ý nghĩa Lâm sàng:</b> Mặc dù rất không đặc hiệu, LD là một yếu tố tiên lượng mạnh mẽ trong nhiều bệnh ung thư, đặc biệt là u lympho, bệnh bạch cầu, u tế bào mầm và u sắc tố. Nồng độ LD cao trước điều trị thường liên quan đến tiên lượng xấu. Sự thay đổi nồng độ LD trong quá trình điều trị cũng giúp đánh giá đáp ứng.' },
+    { name: 'Prostate-specific Antigen (PSA)', category: 'Enzym', icon: '🧪', description: 'Dấu ấn quan trọng nhất cho ung thư tuyến tiền liệt. Tỷ lệ %fPSA giúp phân biệt ung thư và phì đại lành tính.', associatedCancers: ['Tuyến tiền liệt'], clinicalUse: 'Sàng lọc, chẩn đoán, theo dõi, tiên lượng.', aiExplanation: '<b>Cơ chế Sinh học:</b> PSA là một enzym protease được sản xuất gần như độc quyền bởi các tế bào biểu mô của tuyến tiền liệt. Chức năng sinh lý của nó là làm lỏng tinh dịch để giúp tinh trùng di chuyển dễ dàng.<br><br><b>Vai trò trong Bệnh học:</b> Cấu trúc bình thường của tuyến tiền liệt ngăn không cho PSA rò rỉ nhiều vào máu. Trong ung thư tuyến tiền liệt, cấu trúc này bị phá vỡ, cho phép một lượng lớn PSA đi vào hệ tuần hoàn. Nó cũng tăng trong các tình trạng lành tính như phì đại tuyến tiền liệt (BPH) hoặc viêm tuyến tiền liệt, nhưng mức độ tăng thường ít hơn.<br><br><b>Ý nghĩa Lâm sàng:</b> PSA là dấu ấn ung thư có giá trị nhất, được sử dụng rộng rãi để sàng lọc, hỗ trợ chẩn đoán, phân giai đoạn, theo dõi sau điều trị và phát hiện tái phát ung thư tuyến tiền liệt. Tỷ lệ %PSA tự do (%fPSA) giúp phân biệt ung thư (thường có %fPSA thấp) và BPH (thường có %fPSA cao) khi PSA toàn phần ở "vùng xám" (4-10 ng/mL).' },
+    { name: 'Alpha-Fetoprotein (AFP)', category: 'Kháng nguyên Bào thai', icon: '👶', description: 'Dấu ấn chính cho ung thư gan nguyên phát (HCC) và một số u tế bào mầm.', associatedCancers: ['Gan nguyên phát (HCC)', 'U tế bào mầm (túi noãn hoàng)'], clinicalUse: 'Sàng lọc (nhóm nguy cơ cao), chẩn đoán, theo dõi.', aiExplanation: '<b>Cơ chế Sinh học:</b> AFP là protein huyết tương chính trong giai đoạn bào thai, được sản xuất bởi túi noãn hoàng và gan của thai nhi. Sau khi sinh, gen sản xuất AFP bị bất hoạt và nồng độ của nó giảm xuống mức rất thấp ở người trưởng thành.<br><br><b>Vai trò trong Bệnh học:</b> Trong ung thư biểu mô tế bào gan (HCC) và u túi noãn hoàng (một loại u tế bào mầm), các tế bào ác tính trải qua quá trình "phi biệt hóa", tái hoạt động gen AFP và sản xuất nó với số lượng lớn. AFP cũng có thể tăng nhẹ trong các bệnh gan lành tính (viêm gan, xơ gan) do sự tái tạo tế bào gan.<br><br><b>Ý nghĩa Lâm sàng:</b> AFP là một dấu ấn quan trọng. Nó được dùng để sàng lọc HCC ở những người có nguy cơ cao (ví dụ: xơ gan). Nồng độ AFP rất cao (>500 ng/mL) có độ đặc hiệu lớn cho chẩn đoán HCC. Nó cũng được sử dụng để theo dõi đáp ứng điều trị và phát hiện tái phát của HCC và u tế bào mầm.' },
+    { name: 'Carcinoembryonic Antigen (CEA)', category: 'Kháng nguyên Bào thai', icon: '👶', description: 'Dấu ấn quan trọng nhất để theo dõi ung thư đại trực tràng. Cũng tăng trong nhiều ung thư khác và ở người hút thuốc.', associatedCancers: ['Đại trực tràng', 'Phổi', 'Vú', 'Tụy', 'Dạ dày'], clinicalUse: 'Theo dõi tái phát, tiên lượng (chủ yếu cho đại trực tràng).', aiExplanation: '<b>Cơ chế Sinh học:</b> CEA là một glycoprotein tham gia vào sự kết dính tế bào, được biểu hiện ở mức độ cao trong mô đường tiêu hóa của thai nhi. Ở người trưởng thành, sự sản xuất CEA bị hạn chế rất nhiều.<br><br><b>Vai trò trong Bệnh học:</b> Nhiều loại ung thư biểu mô tuyến, đặc biệt là ung thư đại trực tràng, tái biểu hiện CEA và giải phóng nó vào máu. Nồng độ CEA thường tương quan với gánh nặng khối u và giai đoạn bệnh.<br><br><b>Ý nghĩa Lâm sàng:</b> CEA không đủ đặc hiệu để sàng lọc hoặc chẩn đoán ban đầu (vì nó cũng tăng ở người hút thuốc và trong các bệnh viêm). Tuy nhiên, nó là dấu ấn tiêu chuẩn vàng để theo dõi sau điều trị ung thư đại trực tràng. Sự tăng CEA sau phẫu thuật thường là dấu hiệu sớm nhất của bệnh tái phát, đi trước các triệu chứng lâm sàng vài tháng. Nó cũng có giá trị tiên lượng.' },
+    { name: 'CA 125', category: 'Carbohydrate', icon: '🍬', description: 'Dấu ấn tiêu chuẩn để theo dõi ung thư buồng trứng thể biểu mô. Không đặc hiệu.', associatedCancers: ['Buồng trứng (biểu mô)'], clinicalUse: 'Theo dõi, đánh giá đáp ứng điều trị, phát hiện tái phát.', aiExplanation: '<b>Cơ chế Sinh học:</b> CA 125 là một glycoprotein lớn, là một epitope của protein MUC16. Nó được biểu hiện trên bề mặt của các tế bào có nguồn gốc từ coelomic epithelium (phúc mạc, màng phổi, màng tim, và biểu mô ống Müllerian).<br><br><b>Vai trò trong Bệnh học:</b> Trong ung thư buồng trứng thể biểu mô, các tế bào ung thư sản xuất quá mức và giải phóng CA 125 vào máu. Tuy nhiên, nó không đặc hiệu vì bất kỳ sự kích thích hoặc viêm nào của phúc mạc (ví dụ: lạc nội mạc tử cung, viêm vùng chậu, xơ gan, thậm chí cả kinh nguyệt) cũng có thể làm tăng nồng độ CA 125.<br><br><b>Ý nghĩa Lâm sàng:</b> Do độ đặc hiệu thấp, CA 125 không được dùng để sàng lọc ung thư buồng trứng trong cộng đồng. Vai trò quan trọng nhất của nó là để theo dõi đáp ứng với hóa trị và phát hiện sớm bệnh tái phát ở những bệnh nhân đã được chẩn đoán. Sự thay đổi nồng độ CA 125 thường tương quan tốt với tình trạng bệnh.' },
+    { name: 'CA 15-3 / CA 27.29', category: 'Carbohydrate', icon: '🍬', description: 'Các dấu ấn chính để theo dõi ung thư vú, đặc biệt ở giai đoạn di căn.', associatedCancers: ['Vú'], clinicalUse: 'Theo dõi bệnh di căn.', aiExplanation: '<b>Cơ chế Sinh học:</b> Cả CA 15-3 và CA 27.29 đều là các xét nghiệm phát hiện các epitope khác nhau trên cùng một phân tử glycoprotein lớn có tên là MUC1. MUC1 được biểu hiện trên đỉnh của các tế bào biểu mô tuyến, bao gồm cả tuyến vú.<br><br><b>Vai trò trong Bệnh học:</b> Trong ung thư vú, các tế bào ác tính thường sản xuất quá mức một dạng MUC1 bất thường, bị glycosyl hóa sai và mất đi tính phân cực, dẫn đến việc nó bị giải phóng vào hệ tuần hoàn.<br><br><b>Ý nghĩa Lâm sàng:</b> Các dấu ấn này không đủ nhạy để phát hiện ung thư vú giai đoạn sớm. Giá trị chính của chúng là để theo dõi bệnh nhân ung thư vú di căn. Sự tăng hoặc giảm nồng độ CA 15-3/CA 27.29 thường phản ánh sự tiến triển hoặc thoái lui của bệnh dưới tác động của điều trị toàn thân (hóa trị, nội tiết). Chúng đặc biệt hữu ích trong việc theo dõi di căn xương và gan.' },
+    { name: 'CA 19-9', category: 'Carbohydrate', icon: '🍬', description: 'Dấu ấn quan trọng cho ung thư tụy và đường mật. Không được sản xuất ở người có kiểu hình Lewis (a-b-).', associatedCancers: ['Tụy', 'Đường mật', 'Dạ dày', 'Đại trực tràng'], clinicalUse: 'Hỗ trợ chẩn đoán, theo dõi, tiên lượng.', aiExplanation: '<b>Cơ chế Sinh học:</b> CA 19-9 là một kháng nguyên carbohydrate, cụ thể là một dạng sialyl hóa của kháng nguyên nhóm máu Lewis a. Việc tổng hợp nó đòi hỏi sự có mặt của enzym fucosyltransferase, được mã hóa bởi gen Lewis.<br><br><b>Vai trò trong Bệnh học:</b> Nó được sản xuất bởi các tế bào biểu mô của tụy, đường mật, và một số cơ quan khác. Trong ung thư tụy và đường mật, các tế bào ung thư sản xuất nó với số lượng rất lớn. Một hạn chế quan trọng là những người có kiểu gen Lewis âm tính (le/le, khoảng 5-10% dân số) không thể sản xuất CA 19-9, ngay cả khi họ bị ung thư.<br><br><b>Ý nghĩa Lâm sàng:</b> CA 19-9 là dấu ấn quan trọng nhất cho ung thư tụy. Nó hữu ích trong việc tiên lượng (nồng độ cao có tiên lượng xấu), đánh giá khả năng phẫu thuật, và theo dõi đáp ứng điều trị cũng như phát hiện tái phát sau phẫu thuật.' },
+];
+
+const cancerMarkerData = {
+    'Vú': { markers: [ { name: 'CA 15-3 / CA 27.29', use: 'Theo dõi bệnh di căn.' }, { name: 'ER / PR', use: 'Tiên đoán đáp ứng liệu pháp nội tiết (xét nghiệm mô).' }, { name: 'HER-2/neu', use: 'Tiên đoán đáp ứng liệu pháp đích (xét nghiệm mô).' } ], aiCase: '<b>Bệnh cảnh:</b> Bệnh nhân nữ, 55 tuổi, sau mãn kinh, tự sờ thấy khối u không đau ở 1/4 trên ngoài vú phải, kích thước khoảng 2x3 cm, cứng, di động hạn chế. Không có triệu chứng toàn thân khác.<br><br><b>Kết quả Cận lâm sàng:</b> Siêu âm và mammography cho thấy khối u nghi ngờ ác tính. Xét nghiệm máu: CA 15-3 là 95 U/mL (tăng cao). Sinh thiết lõi khối u cho kết quả: Ung thư biểu mô ống xâm nhập, độ 2. Hóa mô miễn dịch: ER 90% (dương tính mạnh), PR 70% (dương tính), HER-2 âm tính (1+).<br><br><b>Bàn luận:</b> Nồng độ CA 15-3 tăng củng cố nghi ngờ ác tính và gợi ý gánh nặng khối u. Kết quả ER/PR dương tính mạnh cho thấy khối u phụ thuộc nội tiết và bệnh nhân là ứng cử viên sáng giá cho liệu pháp nội tiết (ví dụ: thuốc ức chế aromatase). HER-2 âm tính loại trừ chỉ định điều trị bằng Trastuzumab. Bệnh nhân được lên kế hoạch phẫu thuật cắt bỏ khối u và nạo hạch nách, sau đó sẽ được điều trị bổ trợ bằng liệu pháp nội tiết. CA 15-3 sẽ được sử dụng để theo dõi đáp ứng điều trị và phát hiện sớm tái phát trong tương lai.' },
+    'Phổi': { markers: [ { name: 'CYFRA 21-1', use: 'Dấu ấn chính cho ung thư không tế bào nhỏ (NSCLC).' }, { name: 'NSE', use: 'Dấu ấn chính cho ung thư tế bào nhỏ (SCLC).' }, { name: 'CEA', use: 'Không đặc hiệu, dùng để theo dõi.' } ], aiCase: '<b>Bệnh cảnh:</b> Bệnh nhân nam, 65 tuổi, nghiện thuốc lá nặng (40 gói.năm), đến khám vì ho ra máu, sụt 8kg trong 3 tháng. Khám thấy có hội chứng tĩnh mạch chủ trên.<br><br><b>Kết quả Cận lâm sàng:</b> CT ngực có khối u lớn ở trung tâm phổi phải, xâm lấn trung thất và hạch rốn phổi. Xét nghiệm máu: NSE là 98 ng/mL (tăng rất cao), CYFRA 21-1 là 3.5 ng/mL (bình thường), CEA là 12 ng/mL (tăng nhẹ). Sinh thiết khối u xác nhận chẩn đoán Ung thư phổi tế bào nhỏ (SCLC).<br><br><b>Bàn luận:</b> Nồng độ NSE tăng rất cao là một chỉ điểm cực kỳ mạnh mẽ cho SCLC, giúp phân biệt với NSCLC (trong đó CYFRA 21-1 thường tăng). CEA tăng nhẹ không đặc hiệu nhưng phù hợp với bệnh cảnh ung thư. Chẩn đoán SCLC giai đoạn lan tràn được xác lập. Bệnh nhân được bắt đầu hóa trị liệu toàn thân. NSE sẽ là dấu ấn chính để theo dõi đáp ứng với điều trị.' },
+    'Đại trực tràng': { markers: [ { name: 'CEA', use: 'Dấu ấn quan trọng nhất để theo dõi.' }, { name: 'K-ras', use: 'Xét nghiệm đột biến gen để quyết định liệu pháp kháng EGFR.' } ], aiCase: '<b>Bệnh cảnh:</b> Bệnh nhân nam, 62 tuổi, đi khám vì thay đổi thói quen đại tiện và đi cầu ra máu trong 2 tháng. Nội soi đại tràng phát hiện khối u sùi loét ở trực tràng, cách rìa hậu môn 10 cm.<br><br><b>Kết quả Cận lâm sàng:</b> Xét nghiệm máu: CEA là 85 ng/mL (tăng cao). Sinh thiết khối u chẩn đoán: Ung thư biểu mô tuyến của đại trực tràng. CT bụng phát hiện nhiều tổn thương nghi ngờ di căn ở gan. Xét nghiệm đột biến gen từ mô u cho thấy K-ras dạng hoang dã (không đột biến).<br><br><b>Bàn luận:</b> Nồng độ CEA rất cao phù hợp với bệnh ở giai đoạn di căn (giai đoạn IV). Việc K-ras không đột biến là một thông tin cực kỳ quan trọng, cho thấy bệnh nhân là ứng cử viên cho liệu pháp điều trị đích kháng EGFR (như Cetuximab) kết hợp với hóa trị. Bệnh nhân được bắt đầu phác đồ hóa trị kết hợp với Cetuximab. CEA sẽ được theo dõi định kỳ mỗi 3 tháng để đánh giá đáp ứng điều trị.' },
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs = document.querySelectorAll('[data-tab]');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const markerGrid = document.getElementById('marker-grid');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const cancerFilterButtonsContainer = document.getElementById('cancer-filter-buttons');
+    const cancerMarkerResults = document.getElementById('cancer-marker-results');
+
+    function initTabs() {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.getAttribute('data-tab');
+                tabs.forEach(t => { t.classList.remove('tab-active'); t.classList.add('tab-inactive'); });
+                tab.classList.add('tab-active');
+                tab.classList.remove('tab-inactive');
+                tabContents.forEach(content => {
+                    content.style.display = content.id === targetId ? 'block' : 'none';
+                    if (content.id === targetId) {
+                        // Trigger animations for newly visible content
+                        triggerAnimations(content);
+                    }
+                });
+            });
+        });
+        tabContents.forEach((content, index) => { if (index !== 0) content.style.display = 'none'; });
+    }
+
+    function renderMarkers(filter = '', category = 'all') {
+        markerGrid.innerHTML = '';
+        const filteredMarkers = markerData.filter(marker => 
+            marker.name.toLowerCase().includes(filter.toLowerCase()) && (category === 'all' || marker.category === category)
+        );
+
+        if (filteredMarkers.length === 0) {
+            markerGrid.innerHTML = `<p class="text-slate-500 col-span-full text-center py-10">Không tìm thấy dấu ấn phù hợp.</p>`;
+            return;
+        }
+
+        filteredMarkers.forEach(marker => {
+            const card = document.createElement('div');
+            card.className = 'marker-card rounded-xl p-5 cursor-pointer animated-item fade-in-up';
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">${marker.name}</h3>
+                        <p class="text-sm text-teal-600 font-semibold flex items-center"><span class="text-xl mr-1">${marker.icon || ''}</span>${marker.category}</p>
+                    </div>
+                    <span class="text-2xl text-slate-400 transform transition-transform duration-300">›</span>
+                </div>
+                <div class="marker-detail mt-4 pt-4 border-t border-slate-200 text-sm text-slate-600 space-y-3">
+                    <p><strong>Mô tả:</strong> ${marker.description}</p>
+                    <p><strong>Ung thư liên quan:</strong> ${marker.associatedCancers.join(', ')}</p>
+                    <p><strong>Ứng dụng chính:</strong> ${marker.clinicalUse}</p>
+                    <div class="text-center mt-4">
+                        <button class="ai-button explain-btn">✨ Giải thích Chuyên sâu</button>
+                    </div>
+                    <div class="static-ai-content mt-4 p-4 bg-teal-50 rounded-lg border border-teal-200 text-slate-700 space-y-3">
+                        ${marker.aiExplanation || '<p>Chưa có giải thích chi tiết.</p>'}
+                    </div>
+                </div>`;
+            
+            const explainBtn = card.querySelector('.explain-btn');
+            const aiContent = card.querySelector('.static-ai-content');
+
+            explainBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                aiContent.classList.toggle('open');
+                explainBtn.textContent = aiContent.classList.contains('open') ? 'Ẩn Giải thích' : '✨ Giải thích Chuyên sâu';
+            });
+
+            card.addEventListener('click', (e) => {
+                if(e.target.classList.contains('ai-button')) return;
+                card.classList.toggle('open');
+                card.querySelector('span').classList.toggle('rotate-90');
+            });
+            markerGrid.appendChild(card);
+        });
+        triggerAnimations(markerGrid);
+    }
+    
+    function displayCancerMarkers(cancer) {
+        const data = cancerMarkerData[cancer];
+        if (!data) return;
+        
+        let html = `<h3 class="text-xl font-bold text-teal-700 mb-4 animated-item fade-in-down">Các dấu ấn chính cho Ung thư ${cancer}</h3>`;
+        html += '<ul class="space-y-4">';
+        data.markers.forEach((marker, index) => {
+            html += `<li class="border-l-4 border-teal-400 pl-4 animated-item fade-in-up" style="transition-delay: ${index * 100}ms;"><p class="font-semibold text-slate-800 text-md">${marker.name}</p><p class="text-sm text-slate-600">${marker.use}</p></li>`;
+        });
+        html += '</ul>';
+        html += `
+            <div class="text-center mt-8 animated-item fade-in-up" style="transition-delay: ${data.markers.length * 100}ms;">
+                <button class="ai-button case-btn">✨ Xem Case Lâm sàng</button>
+            </div>
+            <div class="static-ai-content mt-4 p-5 bg-blue-50 rounded-lg border border-blue-200 text-slate-700 space-y-3">
+                <h4 class="font-bold text-lg text-blue-800">Case Lâm sàng: Ung thư ${cancer}</h4>
+                ${data.aiCase || '<p>Chưa có case lâm sàng mẫu.</p>'}
+            </div>
+        `;
+        cancerMarkerResults.innerHTML = html;
+        
+        const caseBtn = cancerMarkerResults.querySelector('.case-btn');
+        const aiContent = cancerMarkerResults.querySelector('.static-ai-content');
+        
+        caseBtn.addEventListener('click', () => {
+            aiContent.classList.toggle('open');
+            caseBtn.textContent = aiContent.classList.contains('open') ? 'Ẩn Case Lâm sàng' : '✨ Xem Case Lâm sàng';
+        });
+        triggerAnimations(cancerMarkerResults);
+    }
+
+    function setupFilters() {
+        searchInput.addEventListener('input', () => renderMarkers(searchInput.value, categoryFilter.value));
+        categoryFilter.addEventListener('change', () => renderMarkers(searchInput.value, categoryFilter.value));
+    }
+
+    function renderApplicationChart() {
+        const ctx = document.getElementById('applicationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: { labels: ['Sàng lọc', 'Chẩn đoán', 'Phân giai đoạn', 'Tiên lượng', 'Theo dõi & Tái phát'], datasets: [{ label: 'Giá trị ứng dụng lâm sàng', data: [1, 2, 3, 4, 5], backgroundColor: ['#fee2e2', '#ffedd5', '#dbeafe', '#cffafe', '#d1fae5'], borderColor: ['#ef4444', '#f97316', '#3b82f6', '#06b6d4', '#10b981'], borderWidth: 2, borderRadius: 5, }] },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { duration: 1000, easing: 'easeOutQuart' }, scales: { x: { display: false, max: 5.5 }, y: { ticks: { font: { size: 14, weight: '600' }, color: '#334155' }, grid: { display: false } } } }
+        });
+    }
+    
+    function initCancerFilter() {
+        Object.keys(cancerMarkerData).forEach(cancer => {
+            const button = document.createElement('button');
+            button.className = 'px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 rounded-full hover:bg-teal-500 hover:text-white transition-colors duration-200';
+            button.textContent = cancer;
+            button.addEventListener('click', () => {
+                document.querySelectorAll('#cancer-filter-buttons button').forEach(btn => btn.classList.remove('cancer-btn-active'));
+                button.classList.add('cancer-btn-active');
+                displayCancerMarkers(cancer);
+            });
+            cancerFilterButtonsContainer.appendChild(button);
+        });
+    }
+
+    // --- Animation on Scroll ---
+    const animatedItems = document.querySelectorAll('.animated-item');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    function triggerAnimations(container) {
+        const items = container.querySelectorAll('.animated-item');
+        items.forEach(item => observer.observe(item));
+    }
+    
+    // Initial call
+    initTabs();
+    renderMarkers();
+    setupFilters();
+    renderApplicationChart();
+    initCancerFilter();
+    triggerAnimations(document.body);
+});
+</script>
+
+</body>
+</html>
